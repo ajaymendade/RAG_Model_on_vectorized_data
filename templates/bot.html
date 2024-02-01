@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Model Demo</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Retrieval-Augmented Generation Model</h1>
+        
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <form id="promptForm">
+                    <div class="form-group">
+                        <label for="userPrompt">Enter your prompt:</label>
+                        <textarea class="form-control" id="userPrompt" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Generate Response</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Generated Response</h5>
+                        <p class="card-text" id="generatedResponse">Your response will appear here...</p>
+                        <div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#promptForm').on('submit', function(e) {
+                e.preventDefault();
+                var userPrompt = $('#userPrompt').val();
+        
+                // Show loading spinner
+                $('#loadingSpinner').show();
+        
+                $.ajax({
+                    url: "/generate-response",
+                    method: "POST",
+                    data: { prompt: userPrompt },
+                    success: function(response) {
+                        // Access the 'generated_response' property and update the content of the generatedResponse element
+                        var generatedResponse = response.generated_response;
+        
+                        // Check if the generated response contains a URL
+                        var hasLink = generatedResponse.includes("http");
+        
+                        // If a link is present, make it clickable
+                        if (hasLink) {
+                            generatedResponse = generatedResponse.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+                        }
+        
+                        $('#generatedResponse').html(generatedResponse);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Error:", xhr, status, error);
+                    },
+                    complete: function() {
+                        // Hide loading spinner after the request is complete
+                        $('#loadingSpinner').hide();
+                    }
+                });
+            });
+        });
+        
+        
+    </script>
+</body>
+</html>
