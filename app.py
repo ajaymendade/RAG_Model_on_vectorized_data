@@ -7,7 +7,7 @@ import openai
 
 
 app = Flask(__name__)
-openai.api_key = ""
+openai.api_key = "open_ai_key"
 # Initialize the BERT model
 model = SentenceTransformer('bert-base-uncased')
 
